@@ -1,15 +1,22 @@
 namespace Tienda;
 
-public static class ServicioDeProductos
+public class ServicioDeProductos : IServicioDeProductos
 {
-    public static Producto Crear(string nombre, decimal precio, int stock, int categoriaId)
+    private readonly TiendaDBContext _contexto;
+    
+    public ServicioDeProductos(TiendaDBContext contexto)
+    {
+        _contexto = contexto;
+    }
+    
+    public Producto Crear(string nombre, decimal precio, int stock, int categoriaId)
     {
         if (!Validar(nombre, precio, stock, out string mensaje)) 
         {  
             throw new ArgumentException(mensaje); 
         }
 
-        Categoria categoria = Contexto.Db.Categorias.Find(categoriaId); 
+        Categoria categoria = _contexto.Categorias.Find(categoriaId); 
         if (categoria is null)
         {
             throw new ArgumentException("La categoria indicada no existe.");
@@ -23,15 +30,15 @@ public static class ServicioDeProductos
             Categoria = categoria,
         };
 
-        Contexto.Db.Productos.Add(nuevoProducto);
-        Contexto.Db.SaveChanges();
+        _contexto.Productos.Add(nuevoProducto);
+        _contexto.SaveChanges();
         
         return nuevoProducto;
     }
 
-    public static void Modificar(int id, string nombre, decimal precio, int stock, int categoriaId)
+    public void Modificar(int id, string nombre, decimal precio, int stock, int categoriaId)
     {
-        Producto producto = Contexto.Db.Productos.Find(id);
+        Producto producto = _contexto.Productos.Find(id);
         if (producto is null)
         {
             throw new ArgumentException("El producto no existe.");
@@ -42,7 +49,7 @@ public static class ServicioDeProductos
             throw new ArgumentException(mensaje);
         }
 
-        Categoria categoria = Contexto.Db.Categorias.Find(categoriaId); 
+        Categoria categoria = _contexto.Categorias.Find(categoriaId); 
         if (categoria is null)
         {
             throw new ArgumentException("La categoria indicada no existe.");
@@ -57,24 +64,24 @@ public static class ServicioDeProductos
         
     }
 
-    public static void Eliminar(int id)
+    public void Eliminar(int id)
     {
-        Producto producto = Contexto.Db.Productos.Find(id);
+        Producto producto = _contexto.Productos.Find(id);
         if (producto is null)
         {
             throw new ArgumentException("El producto no existe.");
         }
 
         producto.Activo = false;
-        Contexto.Db.SaveChanges();
+        _contexto.SaveChanges();
     }
 
-    public static List<Producto> Listar(int? categoriaId = null, string? nombre = null)
+    public List<Producto> Listar(int? categoriaId = null, string? nombre = null)
     {
-        return Contexto.Db.Productos.ToList();   
+        return _contexto.Productos.ToList();   
     }
 
-    private static bool Validar(string nombre, decimal precio, int stock, out string mensajeError)
+    private bool Validar(string nombre, decimal precio, int stock, out string mensajeError)
     {
         mensajeError = string.Empty;
 
@@ -101,7 +108,4 @@ public static class ServicioDeProductos
         return true;
     }
 
-
-
-   
 }
