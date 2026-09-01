@@ -16,29 +16,7 @@ public class Producto
         throw new NotImplementedException();
     }
 
-    public static Producto Crear(string nombre, decimal precio, int stock, int categoriaId)
-    {
-        if (!Validar(nombre, precio, stock, categoriaId, out string mensaje)) 
-        {  
-            throw new NotImplementedException(mensaje); 
-        }
-
-        Categoria categoria = Contexto.Db.Categorias.Find(categoriaId);
-
-        var producto = new Producto
-        {
-            Nombre = nombre.Trim(),
-            Precio = precio,
-            Stock = stock,
-            Categoria = categoria,
-        };
-
-        Contexto.Db.Productos.Add(producto);
-        Contexto.Db.SaveChanges();
-        
-        return producto;
-    }
-
+    
     public void Modificar(string nombre, decimal precio, int categoriaId)
     {
         if(!Validar(nombre, precio, Stock, categoriaId, out string mensaje))
